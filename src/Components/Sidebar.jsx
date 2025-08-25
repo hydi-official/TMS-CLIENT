@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useSidebar } from '../Context/SidebarContext';
 import { 
   Home, 
   User, 
@@ -19,7 +20,7 @@ import {
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const { isExpanded, toggleSidebar } = useSidebar();
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,9 +52,7 @@ const Sidebar = () => {
     navigate('/login');
   };
 
-  const toggleSidebar = () => {
-    setIsExpanded(!isExpanded);
-  };
+
 
   // Define menu items based on user role
   const getMenuItems = () => {
@@ -78,9 +77,9 @@ const Sidebar = () => {
           },
           {
             icon: BookOpen,
-            label: 'Courses',
-            path: '/student/courses',
-            active: location.pathname === '/student/courses'
+            label: 'Lecturers',
+            path: '/student/lecturers',
+            active: location.pathname === '/student/lecturers'
           },
           {
             icon: Calendar,
@@ -221,9 +220,7 @@ const Sidebar = () => {
               <p className="text-sm text-slate-300 truncate">
                 {user.fullName || user.firstName + ' ' + user.lastName || 'User'}
               </p>
-              <p className="text-xs text-indigo-400 uppercase tracking-wider">
-                {user.role}
-              </p>
+            
             </div>
           </div>
         </div>

@@ -17,6 +17,7 @@ import Lecturerprofile from '../Pages/lecturer/Profile';
 import AdminDashboard from '../Pages/admin/Dashboard';
 import ManageUsers from '../Pages/admin/ManageUsers';
 import ForgotPin from '../Pages/ForgotPin';
+import Lecturers from '../Pages/student/Lecturers';
 
 const Routers = () => {
   return (
@@ -37,6 +38,7 @@ const Routers = () => {
       {/* Student routes */}
       <Route path="/student/dashboard" element={<StudentDashboard />} />
       <Route path="/student/profile" element={<Profile />} />
+      <Route path="/student/lecturers" element={<Lecturers />} />
 
       {/* Lecturer routes */}
       <Route path="/lecturer/dashboard" element={<LecturerDashboard />} />

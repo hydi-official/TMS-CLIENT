@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, Calendar, BarChart3, Bell, Award, Clock } from 'lucide-react';
+import logo from '../../assets/images/logo.png';
 
 const StudentDashboard = () => {
   const [user, setUser] = useState(null);
@@ -36,13 +37,24 @@ const StudentDashboard = () => {
       <div className="bg-white shadow-sm border-b border-gray-200 mb-8">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Welcome back, {user?.fullName || user?.firstName || 'Student'}! 🎓
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Ready to continue your learning journey today?
-              </p>
+            <div className="flex items-center space-x-4">
+              {/* Logo */}
+              <div className="flex-shrink-0">
+                <img 
+                  src={logo} 
+                  alt="Institution Logo" 
+                  className="h-16 w-16 object-contain rounded-lg shadow-sm bg-white border border-gray-200 p-2"
+                />
+              </div>
+              {/* Welcome Text */}
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Welcome back, {user?.fullName || user?.firstName || 'Student'}! 🎓
+                </h1>
+                <p className="text-gray-600 mt-2">
+                  Ready to continue your learning journey today?
+                </p>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-500">Today's Date</p>
