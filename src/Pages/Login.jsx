@@ -6,6 +6,7 @@ import leftimage from '../assets/images/leftimage.png'
 const Login = () => {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedRole, setSelectedRole] = useState("student"); // Default to student
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ const Login = () => {
     try {
       const response = await axios.post(`${BASE_URL}/auth/login`, {
         userId,
-        pin: password // Keep backend compatibility
+        pin: password, // Keep backend compatibility
+        role: selectedRole // Include selected role in the request
       });
 
       const { data } = response;
@@ -32,9 +34,8 @@ const Login = () => {
 
       console.log("Login Success:", data);
 
-      // Route based on user role
-      const userRole = data.role;
-      switch (userRole) {
+      // Route based on selected role (you can also verify against data.role if needed)
+      switch (selectedRole) {
         case "student":
           navigate("/student/dashboard");
           break;
@@ -59,6 +60,11 @@ const Login = () => {
 
   const handleForgotPassword = () => {
     navigate("/forgot-pin");
+  };
+
+  const handleRoleChange = (role) => {
+    setSelectedRole(role);
+    setError(""); // Clear any previous errors when role changes
   };
 
   return (
@@ -90,14 +96,56 @@ const Login = () => {
           )}
 
           <form onSubmit={handleLogin} className="space-y-6">
-            {/* Student ID */}
+            {/* Role Selection */}
+            <div>
+              <label className="block text-white text-sm font-medium mb-3">
+                Sign in as:
+              </label>
+              <div className="flex flex-col space-y-2">
+                <label className="flex items-center text-white cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="student"
+                    checked={selectedRole === "student"}
+                    onChange={() => handleRoleChange("student")}
+                    className="mr-3 w-4 h-4 text-gray-300 focus:ring-gray-400 focus:ring-2"
+                  />
+                  Student
+                </label>
+                <label className="flex items-center text-white cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="lecturer"
+                    checked={selectedRole === "lecturer"}
+                    onChange={() => handleRoleChange("lecturer")}
+                    className="mr-3 w-4 h-4 text-gray-300 focus:ring-gray-400 focus:ring-2"
+                  />
+                  Lecturer
+                </label>
+                <label className="flex items-center text-white cursor-pointer">
+                  <input
+                    type="radio"
+                    name="role"
+                    value="admin"
+                    checked={selectedRole === "admin"}
+                    onChange={() => handleRoleChange("admin")}
+                    className="mr-3 w-4 h-4 text-gray-300 focus:ring-gray-400 focus:ring-2"
+                  />
+                  Administrator
+                </label>
+              </div>
+            </div>
+
+            {/* User ID */}
             <div>
               <label className="block text-white text-sm font-medium mb-2">
-                Student ID:
+                {selectedRole === "student" ? "Student ID:" : selectedRole === "lecturer" ? "Lecturer ID:" : "Admin ID:"}
               </label>
               <input
                 type="text"
-                placeholder="Enter ID"
+                placeholder={`Enter ${selectedRole === "student" ? "Student" : selectedRole === "lecturer" ? "Lecturer" : "Admin"} ID`}
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 className="w-full p-4 rounded-full bg-gray-200 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -130,7 +178,7 @@ const Login = () => {
                   : 'bg-gray-200 hover:bg-gray-300'
               }`}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Logging in..." : `Login as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
             </button>
           </form>
 

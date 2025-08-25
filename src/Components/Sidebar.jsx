@@ -105,6 +105,12 @@ const Sidebar = () => {
             active: location.pathname === '/lecturer/students'
           },
           {
+            icon: Users,
+            label: 'Students Approval',
+            path: '/lecturer/students/approval',
+            active: location.pathname === '/lecturer/students/approval'
+          },
+          {
             icon: BookOpen,
             label: 'Courses',
             path: '/lecturer/courses',
