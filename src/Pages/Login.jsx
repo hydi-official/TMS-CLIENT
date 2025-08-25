@@ -28,9 +28,12 @@ const Login = () => {
 
       const { data } = response;
       
-      // Store token in localStorage (or consider using httpOnly cookies for better security)
+      // Store token and user data in localStorage
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
+
+      // Dispatch custom event to notify other components (like Sidebar) of user data update
+      window.dispatchEvent(new CustomEvent('userDataUpdated', { detail: data }));
 
       console.log("Login Success:", data);
 

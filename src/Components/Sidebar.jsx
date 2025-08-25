@@ -30,17 +30,49 @@ const Sidebar = () => {
                            location.pathname === '/login' || 
                            location.pathname === '/forgot-pin';
 
-  useEffect(() => {
-    // Get user data from localStorage
+  const loadUserData = () => {
     const userData = localStorage.getItem('user');
     if (userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        console.log('User data loaded:', parsedUser); // Debug log
       } catch (error) {
         console.error('Error parsing user data:', error);
+        setUser(null);
       }
+    } else {
+      setUser(null);
     }
-  }, []);
+  };
+
+  useEffect(() => {
+    // Load user data initially
+    loadUserData();
+
+    // Listen for storage changes (when localStorage is updated)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user') {
+        loadUserData();
+      }
+    };
+
+    // Listen for custom events (we'll dispatch this from login)
+    const handleUserUpdate = () => {
+      loadUserData();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userDataUpdated', handleUserUpdate);
+
+    // Also check for user data changes on location change
+    loadUserData();
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userDataUpdated', handleUserUpdate);
+    };
+  }, [location.pathname]); // Re-run when route changes
 
   if (shouldHideSidebar || !user) {
     return null;
@@ -49,10 +81,9 @@ const Sidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    setUser(null); // Clear user state immediately
     navigate('/login');
   };
-
-
 
   // Define menu items based on user role
   const getMenuItems = () => {
@@ -224,9 +255,11 @@ const Sidebar = () => {
                 Welcome back!
               </p>
               <p className="text-sm text-slate-300 truncate">
-                {user.fullName || user.firstName + ' ' + user.lastName || 'User'}
+                {user.fullName || (user.firstName && user.lastName ? user.firstName + ' ' + user.lastName : 'User')}
               </p>
-            
+              <p className="text-xs text-slate-400 truncate capitalize">
+                {user.role}
+              </p>
             </div>
           </div>
         </div>
