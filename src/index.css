@@ -1,0 +1,276 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base{
+section{
+    @apply py-[75px];
+}
+}
+
+@layer components{
+.container {
+    @apply max-w-full w-[1440px] px-5 mx-auto;
+}
+
+.btn{
+    @apply bg-primaryColor py-[15px] px-[35px] rounded-[50px] text-white font-[600] mt-[38px];
+}
+
+.heading{
+    @apply text-[44px] leading-[54px] font-[700] text-headingColor;
+}
+    .text__para{
+        @apply text-[18px] leading-[30px] font-[400] text-textColor mt-[18px];
+    }
+    /* .header{
+        @apply bg-[url('./assets/images/mask.png')] bg-no-repeat bg-center bg-cover w-full h-[100px] leading-[100px];
+    } */
+
+     /* .hero__section{
+        @apply bg-[url('./assets/images/home1.png')] bg-no-repeat bg-center bg-cover;
+    }  */
+
+    @keyframes heroAnimation {
+        0% {
+          background-image: url('./assets/images/image_processing20221110-20693-yg8ct3.jpg');
+        }
+        25% {
+          background-image: url('./assets/images/jr-korpa-stwHyPWNtbI-unsplash.jpg');
+        }
+        50% {
+          background-image: url('./assets/images/marek-piwnicki--mCLyqyNsYo-unsplash.jpg');
+        }
+        75% {
+          background-image: url('./assets/images/nasa-rTZW4f02zY8-unsplash.jpg');
+        }
+        100% {
+          background-image: url('./assets/images/original-24dd0d01d231ead3dc20b5a1be1c3297.png');
+        }
+      }
+      
+      .hero__section {
+        animation: heroAnimation 20s infinite; /* Adjust the duration as needed */
+        background-size: cover;
+        background-position: center;
+        height: 100vh; /* Set the height to cover the full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .hero__text {
+        position: absolute;
+        text-align: center;
+        color: #fff; /* Set the text color */
+        font-size: 24px; /* Adjust the font size as needed */
+        font-weight: bold; /* Adjust the font weight as needed */
+        /* You can adjust the positioning of the text using the top, bottom, left, and right properties */
+        top: 60%;
+        transform: translateY(-50%);
+        width: 100%; /* Make the text take up the full width */
+      }
+
+      .modal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 80%;
+        width: 600px; /* Adjust the width as needed */
+        background-color: #fff;
+        padding: 20px;
+        outline: none;
+        border: 2px solid transparent;
+        border-radius: 10px;
+        overflow: hidden;
+        animation: neon-border 1.5s infinite alternate;
+      }
+      
+      .modal-content {
+        max-height: 80vh; /* Adjust the value as needed */
+        overflow-y: auto;
+      }
+      
+      .form {
+        display: flex;
+        flex-direction: column;
+        margin-top: 20px;
+      }
+      
+      .input-field {
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      
+      .submit-button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      
+      .submit-button:hover {
+        background-color: #45a049;
+      }
+      
+      .close-button {
+        background-color: #f44336;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+      
+      .close-button:hover {
+        background-color: #d32f2f;
+      }
+      
+      @keyframes neon-border {
+        from {
+          border-color: #009688;
+        }
+        to {
+          border-color: #39ff14;
+        }
+      }
+      
+
+
+
+      @keyframes ourprojectAnimation {
+        0% {
+          background-image: url('./assets/images/Hero1.jpg');
+        }
+        25% {
+          background-image: url('./assets/images/Hero2.jpg');
+        }
+        50% {
+          background-image: url('./assets/images/Hero4.webp');
+        }
+        75% {
+          background-image: url('./assets/images/Hero5.avif');
+        }
+        100% {
+          background-image: url('./assets/images/Hero6.jpg');
+        }
+      }
+      
+      .ourproject__section {
+        animation: ourprojectAnimation 20s infinite; /* Adjust the duration as needed */
+        background-size: cover;
+        background-position: center;
+        height: 100vh; /* Set the height to cover the full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+
+      
+      @keyframes educationAnimation {
+        0% {
+          background-image: url('./assets/images/edu1.jpg');
+        }
+        25% {
+          background-image: url('./assets/images/edu2.jpg');
+        }
+        50% {
+          background-image: url('./assets/images/edu3.jpg');
+        }
+        75% {
+          background-image: url('./assets/images/edu4.jpg');
+        }
+        100% {
+          background-image: url('./assets/images/edu5.jpg');
+        }
+      }
+      
+
+      .education__section {
+        animation: educationAnimation 20s infinite; /* Adjust the duration as needed */
+        background-size: cover;
+        background-position: center;
+        height: 100vh; /* Set the height to cover the full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+
+    
+      @keyframes infrastructureAnimation {
+        0% {
+          background-image: url('./assets/images/Infras1.jpg');
+        }
+        25% {
+          background-image: url('./assets/images/Infras2.jpg');
+        }
+        50% {
+          background-image: url('./assets/images/Infras3.jpg');
+        }
+        75% {
+          background-image: url('./assets/images/Infras2.png');
+        }
+        100% {
+          background-image: url('./assets/images/Infrastructure.avif');
+        }
+      }
+
+      .infrastructure__section {
+        animation: infrastructureAnimation 20s infinite; /* Adjust the duration as needed */
+        background-size: cover;
+        background-position: center;
+        height: 100vh; /* Set the height to cover the full viewport height */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+
+
+
+
+
+
+    .form__label{
+        @apply text-textColor font-semibold text-[16px] leading-7 mb-2;
+    }
+
+    .form__input
+    {
+        @apply w-full px-4 py-3 border border-solid border-[#0066ff61] 
+        focus:outline-none focus:border-primaryColor text-[16px] leading-7 text-headingColor 
+        placeholder:text-textColor cursor-pointer rounded-md;
+
+    }
+}
+
+
+@media only screen and (max-width: 1024px) { 
+    .container {
+        @apply w-full
+ 
+   }
+
+   section {
+    @apply py-[35px]
+   }
+}
+
+@media only screen and (max-width: 768px) {
+    .heading {
+        @apply text-[260px] leading-[36px]
+    }
+
+    .text__para{
+        @apply text-[16px] leading-7 mt-3
+    }
+}
+
