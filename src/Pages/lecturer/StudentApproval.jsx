@@ -11,6 +11,54 @@ const StudentApproval = () => {
   const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
   const token = localStorage.getItem('token');
 
+  // Helper functions for profile images
+  const getInitials = (fullName) => {
+    if (!fullName) return 'N/A';
+    return fullName
+      .split(' ')
+      .map(name => name.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const getRandomColor = (name) => {
+    const colors = [
+      'bg-purple-500',
+      'bg-blue-500',
+      'bg-green-500',
+      'bg-orange-500',
+      'bg-pink-500',
+      'bg-indigo-500',
+      'bg-red-500',
+      'bg-yellow-500',
+      'bg-teal-500',
+      'bg-cyan-500'
+    ];
+    const index = (name || '').length % colors.length;
+    return colors[index];
+  };
+
+  const ProfileImage = ({ user, size = 'w-12 h-12', textSize = 'text-lg' }) => {
+    const hasImage = user?.profilePicture?.url;
+    
+    if (hasImage) {
+      return (
+        <img
+          src={user.profilePicture.url}
+          alt={user.fullName || 'Profile'}
+          className={`${size} rounded-full object-cover border-2 border-gray-200`}
+        />
+      );
+    }
+
+    return (
+      <div className={`${size} ${getRandomColor(user?.fullName)} rounded-full flex items-center justify-center text-white font-semibold ${textSize}`}>
+        {getInitials(user?.fullName)}
+      </div>
+    );
+  };
+
   // Fetch lecturer requests
   const fetchRequests = async () => {
     try {
@@ -218,9 +266,7 @@ const StudentApproval = () => {
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <User className="w-6 h-6 text-blue-600" />
-                      </div>
+                      <ProfileImage user={request.student.user} />
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900">
                           {request.student.user.fullName}
