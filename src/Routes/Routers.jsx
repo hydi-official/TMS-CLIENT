@@ -16,6 +16,7 @@ import Lecturerprofile from '../Pages/lecturer/Profile';
 
 import AdminDashboard from '../Pages/admin/Dashboard';
 import ManageUsers from '../Pages/admin/ManageUsers';
+import ForgotPin from '../Pages/ForgotPin';
 
 const Routers = () => {
   return (
@@ -28,6 +29,10 @@ const Routers = () => {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/services" element={<Services />} />
+      <Route path="/forgot-pin" element={<ForgotPin />} />
+      <Route path="/login" element={<Login />} />
+
+
 
       {/* Student routes */}
       <Route path="/student/dashboard" element={<StudentDashboard />} />

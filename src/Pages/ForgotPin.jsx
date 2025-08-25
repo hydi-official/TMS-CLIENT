@@ -1,64 +1,48 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import leftimage from '../assets/images/leftimage.png'
+import leftimage from '../assets/images/leftimage.png';
 
-const Login = () => {
+const ForgotPin = () => {
+  const [email, setEmail] = useState("");
   const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   // Access environment variable or fallback to localhost
   const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-  const handleLogin = async (e) => {
+  const handleForgotPin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/login`, {
-        userId,
-        pin: password // Keep backend compatibility
+      const response = await axios.post(`${BASE_URL}/auth/forgot-pin`, {
+        email,
+        userId
       });
 
-      const { data } = response;
+      setSuccess("Password reset instructions have been sent to your email address.");
       
-      // Store token in localStorage (or consider using httpOnly cookies for better security)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data));
-
-      console.log("Login Success:", data);
-
-      // Route based on user role
-      const userRole = data.role;
-      switch (userRole) {
-        case "student":
-          navigate("/student/dashboard");
-          break;
-        case "lecturer":
-          navigate("/lecturer/dashboard");
-          break;
-        case "admin":
-          navigate("/admin/dashboard");
-          break;
-        default:
-          setError("Unknown user role");
-          break;
-      }
+      // Optionally redirect to login after a delay
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
 
     } catch (err) {
-      console.error("Login Failed:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Login failed. Please try again.");
+      console.error("Forgot Pin Failed:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Failed to process request. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleForgotPassword = () => {
-    navigate("/forgot-pin");
+  const handleBackToLogin = () => {
+    navigate("/login");
   };
 
   return (
@@ -67,21 +51,34 @@ const Login = () => {
       <div className="flex-1 relative overflow-hidden">
         <img 
           src={leftimage} 
-          alt="Login Background" 
+          alt="Forgot Pin Background" 
           className="w-full h-full object-cover"
         />
       </div>
 
-      {/* Right Side - Login Form */}
+      {/* Right Side - Forgot Pin Form */}
       <div className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#6B6B83' }}>
         <div className="w-full max-w-md px-8">
-          {/* User Icon */}
+          {/* Lock Icon */}
           <div className="flex justify-center mb-8">
             <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-              <div className="w-8 h-8 bg-gray-600 rounded-full mb-1"></div>
-              <div className="w-12 h-6 bg-gray-600 rounded-t-full"></div>
+              <div className="relative">
+                {/* Lock body */}
+                <div className="w-8 h-6 bg-gray-600 rounded-sm"></div>
+                {/* Lock shackle */}
+                <div className="absolute -top-3 left-1 w-6 h-4 border-2 border-gray-600 rounded-t-lg bg-transparent"></div>
+              </div>
             </div>
           </div>
+
+          {/* Title */}
+          <h2 className="text-2xl font-semibold text-white text-center mb-2">
+            Forgot Password?
+          </h2>
+          
+          <p className="text-gray-300 text-center mb-8 text-sm">
+            Enter your student ID and email address to reset your password
+          </p>
 
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
@@ -89,7 +86,13 @@ const Login = () => {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          {success && (
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+              {success}
+            </div>
+          )}
+
+          <form onSubmit={handleForgotPin} className="space-y-6">
             {/* Student ID */}
             <div>
               <label className="block text-white text-sm font-medium mb-2">
@@ -97,7 +100,7 @@ const Login = () => {
               </label>
               <input
                 type="text"
-                placeholder="Enter ID"
+                placeholder="Enter your Student ID"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 className="w-full p-4 rounded-full bg-gray-200 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -105,42 +108,42 @@ const Login = () => {
               />
             </div>
 
-            {/* Password */}
+            {/* Email */}
             <div>
               <label className="block text-white text-sm font-medium mb-2">
-                Password:
+                Email Address:
               </label>
               <input
-                type="password"
-                placeholder="Enter Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                type="email"
+                placeholder="Enter your Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-4 rounded-full bg-gray-200 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
                 required
               />
             </div>
 
-            {/* Login Button */}
+            {/* Reset Password Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || success}
               className={`w-full p-4 rounded-full text-black font-semibold transition-colors ${
-                loading
+                loading || success
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-gray-200 hover:bg-gray-300'
               }`}
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Sending..." : success ? "Email Sent!" : "Reset Password"}
             </button>
           </form>
 
-          {/* Forgot Password Link */}
+          {/* Back to Login Link */}
           <div className="text-center mt-6">
             <button
-              onClick={handleForgotPassword}
+              onClick={handleBackToLogin}
               className="text-gray-300 underline hover:text-white transition-colors"
             >
-              forgot password
+              Back to Login
             </button>
           </div>
         </div>
@@ -149,4 +152,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default ForgotPin;
