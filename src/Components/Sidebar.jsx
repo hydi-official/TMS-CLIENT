@@ -24,7 +24,8 @@ import {
   LucideMonitorSpeaker,
   Megaphone,
   UsersRoundIcon,
-  Upload
+  Upload,
+  Library
 } from 'lucide-react';
 import { FaMicrophone, FaSpeakerDeck } from 'react-icons/fa';
 
@@ -139,6 +140,12 @@ const Sidebar = () => {
             path: '/student/announcements',
             active: location.pathname === '/student/announcements'
           },
+           {
+            icon: Library,
+            label: 'Student Thesis',
+            path: '/student/thesis',
+            active: location.pathname === '/student/thesis'
+          },
           {
             icon: BarChart3,
             label: 'Grades',
@@ -167,6 +174,12 @@ const Sidebar = () => {
             label: 'Lecturer Submissions',
             path: '/lecturer/submissions',
             active: location.pathname === '/lecturer/submissions'
+          },
+          {
+            icon: Library,
+            label: 'Lecturer Thesis',
+            path: '/lecturer/thesis',
+            active: location.pathname === '/lecturer/thesis'
           },
            {
             icon: BarChart3,
