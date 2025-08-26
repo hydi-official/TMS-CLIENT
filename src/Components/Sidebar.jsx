@@ -22,7 +22,9 @@ import {
   FileArchive,
   SpeakerIcon,
   LucideMonitorSpeaker,
-  Megaphone
+  Megaphone,
+  UsersRoundIcon,
+  Upload
 } from 'lucide-react';
 import { FaMicrophone, FaSpeakerDeck } from 'react-icons/fa';
 
@@ -114,13 +116,13 @@ const Sidebar = () => {
             active: location.pathname === '/student/profile'
           },
           {
-            icon: BookOpen,
+            icon: UsersRoundIcon,
             label: 'Lecturers',
             path: '/student/lecturers',
             active: location.pathname === '/student/lecturers'
           },
            {
-            icon: FileArchive,
+            icon: Upload,
             label: 'Submissions',
             path: '/student/submissions',
             active: location.pathname === '/student/submissions'
@@ -131,11 +133,11 @@ const Sidebar = () => {
             path: '/student/notifications',
             active: location.pathname === '/student/notifications'
           },
-          {
-            icon: Calendar,
-            label: 'Schedule',
-            path: '/student/schedule',
-            active: location.pathname === '/student/schedule'
+             {
+            icon: Megaphone,
+            label: 'Announcements',
+            path: '/student/announcements',
+            active: location.pathname === '/student/announcements'
           },
           {
             icon: BarChart3,
