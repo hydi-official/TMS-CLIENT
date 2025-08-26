@@ -20,6 +20,7 @@ import ForgotPin from '../Pages/ForgotPin';
 import Lecturers from '../Pages/student/Lecturers';
 import StudentApproval from '../Pages/lecturer/StudentApproval';
 import Submissions from '../Pages/lecturer/Submissions';
+import StudentSubmission from '../Pages/student/Submission';
 
 const Routers = () => {
   return (
@@ -41,6 +42,8 @@ const Routers = () => {
       <Route path="/student/dashboard" element={<StudentDashboard />} />
       <Route path="/student/profile" element={<Profile />} />
       <Route path="/student/lecturers" element={<Lecturers />} />
+      <Route path="/student/submissions" element={<StudentSubmission/>} />
+
 
       {/* Lecturer routes */}
       <Route path="/lecturer/dashboard" element={<LecturerDashboard />} />

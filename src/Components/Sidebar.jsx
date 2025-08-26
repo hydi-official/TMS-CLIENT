@@ -112,6 +112,12 @@ const Sidebar = () => {
             path: '/student/lecturers',
             active: location.pathname === '/student/lecturers'
           },
+           {
+            icon: Calendar,
+            label: 'Submissions',
+            path: '/student/submissions',
+            active: location.pathname === '/student/submissions'
+          },
           {
             icon: Calendar,
             label: 'Schedule',
