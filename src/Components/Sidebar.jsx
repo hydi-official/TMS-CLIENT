@@ -273,7 +273,7 @@ const Sidebar = () => {
             <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
               <GraduationCap size={20} />
             </div>
-            <span className="font-bold text-lg">EduPortal</span>
+            <span className="font-bold text-lg">TMSPortal</span>
           </div>
         )}
         <button
