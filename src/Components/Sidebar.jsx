@@ -168,6 +168,12 @@ const Sidebar = () => {
             path: '/lecturer/submissions',
             active: location.pathname === '/lecturer/submissions'
           },
+           {
+            icon: BarChart3,
+            label: 'Grades',
+            path: '/lecturer/grades',
+            active: location.pathname === '/lecturer/grades'
+          },
           {
             icon: BellIcon,
             label: 'Notifications',
