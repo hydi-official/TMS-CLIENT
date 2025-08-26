@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Upload, 
   Eye, 
@@ -9,43 +9,32 @@ import {
   XCircle, 
   AlertTriangle,
   Download,
-  Star,
-  X,
-  BookOpen,
-  Send,
   Calendar,
-  AlertCircle
+  BookOpen,
+  X,
+  Send,
+  FileCheck
 } from 'lucide-react';
 
 const StudentSubmissions = () => {
   const [submissions, setSubmissions] = useState([]);
-  const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showSubmitModal, setShowSubmitModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
-  const [uploading, setUploading] = useState(false);
+  const [processingAction, setProcessingAction] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const fileInputRef = useRef(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const BASE_URL = 'http://localhost:5000/api';
-  
-  // Get token from localStorage
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
+  const token = localStorage.getItem('token');
 
   // Fetch student's submissions
-  const fetchMySubmissions = async () => {
+  const fetchSubmissions = async () => {
     try {
       setLoading(true);
       setError("");
-
-      const token = getToken();
-      if (!token) {
-        throw new Error('No authentication token found. Please login again.');
-      }
 
       const myHeaders = new Headers();
       myHeaders.append("Authorization", `Bearer ${token}`);
@@ -63,8 +52,7 @@ const StudentSubmissions = () => {
       }
 
       const data = await response.json();
-      setSubmissions(data.submissions || []);
-      setUserInfo(data.userInfo || null);
+      setSubmissions(Array.isArray(data.submissions) ? data.submissions : []);
     } catch (err) {
       console.error('Failed to fetch submissions:', err);
       setError(err.message || 'Failed to load submissions');
@@ -77,20 +65,11 @@ const StudentSubmissions = () => {
   // Submit work for a submission
   const handleSubmitWork = async (e) => {
     e.preventDefault();
-    
-    if (!selectedFile || !selectedSubmission) {
-      setError('Please select a file to submit');
-      return;
-    }
+    if (!selectedSubmission || !selectedFile) return;
 
     try {
-      setUploading(true);
-      setError("");
-
-      const token = getToken();
-      if (!token) {
-        throw new Error('No authentication token found. Please login again.');
-      }
+      setProcessingAction('submit');
+      setUploadProgress(0);
 
       const myHeaders = new Headers();
       myHeaders.append("Authorization", `Bearer ${token}`);
@@ -105,8 +84,25 @@ const StudentSubmissions = () => {
         redirect: "follow"
       };
 
-      const response = await fetch(`${BASE_URL}/submissions/${selectedSubmission._id}/submit`, requestOptions);
+      // Simulate upload progress (in a real app, you'd use axios with onUploadProgress)
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return prev;
+          }
+          return prev + 10;
+        });
+      }, 300);
+
+      const response = await fetch(
+        `${BASE_URL}/submissions/${selectedSubmission._id}/submit`, 
+        requestOptions
+      );
       
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
@@ -127,15 +123,14 @@ const StudentSubmissions = () => {
       setSelectedFile(null);
       setShowSubmitModal(false);
       setSelectedSubmission(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setUploadProgress(0);
       
     } catch (err) {
       console.error('Failed to submit work:', err);
       setError(err.message || 'Failed to submit work');
+      setUploadProgress(0);
     } finally {
-      setUploading(false);
+      setProcessingAction(null);
     }
   };
 
@@ -153,8 +148,8 @@ const StudentSubmissions = () => {
     const Icon = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
-        <Icon className="w-4 h-4 mr-2" />
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        <Icon className="w-3 h-3 mr-1" />
         {config.text}
       </span>
     );
@@ -163,31 +158,25 @@ const StudentSubmissions = () => {
   const getDeadlineStatus = (deadline, submittedAt) => {
     const now = new Date();
     const deadlineDate = new Date(deadline);
-    const isOverdue = now > deadlineDate;
-    const isSubmitted = submittedAt;
     
-    const timeDiff = deadlineDate.getTime() - now.getTime();
-    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    let status = 'upcoming';
-    let color = 'text-green-600 bg-green-50';
-    let message = `${daysLeft} days left`;
-
-    if (isSubmitted) {
-      status = 'submitted';
-      color = 'text-blue-600 bg-blue-50';
-      message = 'Submitted on time';
-    } else if (isOverdue) {
-      status = 'overdue';
-      color = 'text-red-600 bg-red-50';
-      message = `${Math.abs(daysLeft)} days overdue`;
-    } else if (daysLeft <= 3) {
-      status = 'urgent';
-      color = 'text-orange-600 bg-orange-50';
-      message = `${daysLeft} days left - Urgent!`;
+    if (submittedAt) {
+      return { status: 'submitted', text: 'Submitted', color: 'text-green-600' };
     }
-
-    return { status, color, message, isOverdue, isSubmitted };
+    
+    if (now > deadlineDate) {
+      return { status: 'overdue', text: 'Overdue', color: 'text-red-600' };
+    }
+    
+    // Calculate days remaining
+    const daysRemaining = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+    
+    if (daysRemaining <= 3) {
+      return { status: 'urgent', text: `${daysRemaining} days left`, color: 'text-red-600' };
+    } else if (daysRemaining <= 7) {
+      return { status: 'approaching', text: `${daysRemaining} days left`, color: 'text-yellow-600' };
+    } else {
+      return { status: 'ok', text: `${daysRemaining} days left`, color: 'text-green-600' };
+    }
   };
 
   const formatDate = (dateString) => {
@@ -200,13 +189,32 @@ const StudentSubmissions = () => {
     });
   };
 
-  const handleFileSelect = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('File size must be less than 10MB');
+        return;
+      }
+      
+      // Check file type (PDF preferred)
+      if (!file.type.includes('pdf') && !file.type.includes('document')) {
+        setError('Please upload a PDF or document file');
+        return;
+      }
+      
+      setSelectedFile(file);
+      setError('');
+    }
   };
 
   useEffect(() => {
-    fetchMySubmissions();
+    if (!token) {
+      setError('No authentication token found. Please login again.');
+      return;
+    }
+    fetchSubmissions();
   }, []);
 
   // Loading state
@@ -226,25 +234,15 @@ const StudentSubmissions = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">My Submissions</h1>
-              <p className="text-gray-600">Track and submit your thesis work</p>
-            </div>
-            {userInfo && (
-              <div className="text-right">
-                <p className="text-lg font-semibold text-gray-900">{userInfo.name}</p>
-                <p className="text-sm text-gray-600">{userInfo.email}</p>
-              </div>
-            )}
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">My Submissions</h1>
+          <p className="text-gray-600">View and submit your thesis work</p>
         </div>
 
         {/* Error Alert */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-md">
             <div className="flex">
-              <AlertCircle className="w-5 h-5 text-red-500 mr-2" />
+              <XCircle className="w-5 h-5 text-red-500 mr-2" />
               <p className="text-red-700">{error}</p>
               <button
                 onClick={() => setError('')}
@@ -257,12 +255,12 @@ const StudentSubmissions = () => {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center">
               <FileText className="w-8 h-8 text-blue-500 mr-3" />
               <div>
-                <p className="text-sm text-gray-600">Total Submissions</p>
+                <p className="text-sm text-gray-600">Total Assignments</p>
                 <p className="text-2xl font-bold text-gray-900">{submissions.length}</p>
               </div>
             </div>
@@ -271,9 +269,9 @@ const StudentSubmissions = () => {
             <div className="flex items-center">
               <CheckCircle className="w-8 h-8 text-green-500 mr-3" />
               <div>
-                <p className="text-sm text-gray-600">Completed</p>
+                <p className="text-sm text-gray-600">Submitted</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {submissions.filter(s => s.status === 'submitted' || s.status === 'accepted').length}
+                  {submissions.filter(s => s.status === 'submitted' || s.status === 'accepted' || s.status === 'rejected').length}
                 </p>
               </div>
             </div>
@@ -289,132 +287,116 @@ const StudentSubmissions = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <Star className="w-8 h-8 text-purple-500 mr-3" />
-              <div>
-                <p className="text-sm text-gray-600">Graded</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {submissions.filter(s => s.grade !== undefined).length}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* Submissions Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {submissions.map((submission) => {
-            const deadlineInfo = getDeadlineStatus(submission.deadline, submission.submittedAt);
-            
-            return (
-              <div key={submission._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div className="p-6">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {submission.title}
-                      </h3>
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                        <BookOpen className="w-3 h-3 mr-1" />
-                        {submission.stage}
-                      </span>
-                    </div>
-                    <div className="ml-4">
-                      {getStatusBadge(submission.status)}
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {submission.description}
-                  </p>
-
-                  {/* Deadline Status */}
-                  <div className={`p-3 rounded-lg mb-4 ${deadlineInfo.color}`}>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2" />
-                      <span className="text-sm font-medium">{deadlineInfo.message}</span>
-                    </div>
-                    <p className="text-xs mt-1 opacity-75">
-                      Deadline: {formatDate(submission.deadline)}
-                    </p>
-                  </div>
-
-                  {/* Grade Display */}
-                  {submission.grade && (
-                    <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-yellow-800">Grade Received</span>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 text-yellow-600 mr-1" />
-                          <span className="text-lg font-bold text-yellow-900">
-                            {submission.grade}/100
-                          </span>
+        {/* Submissions List */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Title & Description
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Stage
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Deadline
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {submissions.map((submission) => {
+                  const deadlineStatus = getDeadlineStatus(submission.deadline, submission.submittedAt);
+                  
+                  return (
+                    <tr key={submission._id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {submission.title}
                         </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Supervisor Info */}
-                  {submission.supervisor && (
-                    <div className="mb-4 text-sm text-gray-600">
-                      <span className="font-medium">Supervisor: </span>
-                      {submission.supervisor.user?.fullName || 'Dr. Mary Lecturer'}
-                    </div>
-                  )}
-
-                  {/* Action Buttons */}
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => {
-                        setSelectedSubmission(submission);
-                        setShowDetailsModal(true);
-                      }}
-                      className="flex-1 flex items-center justify-center px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </button>
-                    
-                    {submission.status === 'not-submitted' && (
-                      <button
-                        onClick={() => {
-                          setSelectedSubmission(submission);
-                          setShowSubmitModal(true);
-                        }}
-                        className="flex-1 flex items-center justify-center px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Submit Work
-                      </button>
-                    )}
-
-                    {submission.file?.url && (
-                      <a
-                        href={submission.file.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center px-3 py-2 text-sm bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
-                      >
-                        <Download className="w-4 h-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {submissions.length === 0 && (
-          <div className="text-center py-12">
-            <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">No Submissions Found</h3>
-            <p className="text-gray-500">Your supervisor will create submissions for you to complete.</p>
+                        <div className="text-sm text-gray-500 mt-1">
+                          {submission.description}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          <BookOpen className="w-3 h-3 mr-1" />
+                          {submission.stage}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(submission.status)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {formatDate(submission.deadline)}
+                        </div>
+                        <div className={`text-xs font-medium ${deadlineStatus.color}`}>
+                          {deadlineStatus.text}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => {
+                              setSelectedSubmission(submission);
+                              setShowDetailsModal(true);
+                            }}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded-md hover:bg-blue-50"
+                            title="View Details"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          
+                          {submission.status === 'not-submitted' && (
+                            <button
+                              onClick={() => {
+                                setSelectedSubmission(submission);
+                                setShowSubmitModal(true);
+                              }}
+                              className="text-green-600 hover:text-green-900 p-1 rounded-md hover:bg-green-50"
+                              title="Submit Work"
+                            >
+                              <Upload className="w-4 h-4" />
+                            </button>
+                          )}
+                          
+                          {submission.file?.url && (
+                            <a
+                              href={submission.file.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-purple-600 hover:text-purple-900 p-1 rounded-md hover:bg-purple-50"
+                              title="Download Submitted File"
+                            >
+                              <Download className="w-4 h-4" />
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          {submissions.length === 0 && (
+            <div className="text-center py-12">
+              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-600 mb-2">No Submissions Found</h3>
+              <p className="text-gray-500">You don't have any submission assignments yet.</p>
+            </div>
+          )}
+        </div>
 
         {/* Submit Work Modal */}
         {showSubmitModal && selectedSubmission && (
@@ -422,16 +404,16 @@ const StudentSubmissions = () => {
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Submit Your Work</h2>
-                  <p className="text-sm text-gray-600 mt-1">{selectedSubmission.title}</p>
+                  <h2 className="text-xl font-bold text-gray-900">Submit Work</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {selectedSubmission.title} - {selectedSubmission.stage}
+                  </p>
                 </div>
                 <button
                   onClick={() => {
                     setShowSubmitModal(false);
                     setSelectedFile(null);
-                    if (fileInputRef.current) {
-                      fileInputRef.current.value = '';
-                    }
+                    setUploadProgress(0);
                   }}
                   className="text-gray-400 hover:text-gray-600"
                 >
@@ -440,48 +422,67 @@ const StudentSubmissions = () => {
               </div>
 
               <form onSubmit={handleSubmitWork} className="space-y-6">
-                {/* Submission Details */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-medium text-gray-900 mb-2">Submission Requirements</h3>
-                  <p className="text-sm text-gray-600 mb-2">{selectedSubmission.description}</p>
-                  <p className="text-sm text-gray-500">
-                    <strong>Deadline:</strong> {formatDate(selectedSubmission.deadline)}
-                  </p>
-                </div>
-
-                {/* File Upload */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Upload Your File
+                    Upload your file (PDF preferred, max 10MB)
                   </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition-colors">
+                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                     <div className="space-y-1 text-center">
-                      <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                      <div className="flex text-sm text-gray-600">
-                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                          <span>Upload a file</span>
-                          <input
-                            ref={fileInputRef}
-                            id="file-upload"
-                            name="file-upload"
-                            type="file"
-                            className="sr-only"
-                            onChange={handleFileSelect}
-                            accept=".pdf,.doc,.docx,.txt"
-                            required
-                          />
-                        </label>
-                        <p className="pl-1">or drag and drop</p>
-                      </div>
-                      <p className="text-xs text-gray-500">PDF, DOC, DOCX, TXT up to 10MB</p>
-                      {selectedFile && (
-                        <p className="text-sm text-green-600 mt-2">
-                          Selected: {selectedFile.name}
-                        </p>
+                      {selectedFile ? (
+                        <div className="flex flex-col items-center">
+                          <FileCheck className="w-12 h-12 text-green-500 mb-2" />
+                          <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedFile(null)}
+                            className="mt-2 text-sm text-red-600 hover:text-red-800"
+                          >
+                            Remove file
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="flex text-sm text-gray-600 justify-center">
+                            <label
+                              htmlFor="file-upload"
+                              className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none"
+                            >
+                              <span>Upload a file</span>
+                              <input
+                                id="file-upload"
+                                name="file-upload"
+                                type="file"
+                                className="sr-only"
+                                onChange={handleFileChange}
+                              />
+                            </label>
+                            <p className="pl-1">or drag and drop</p>
+                          </div>
+                          <p className="text-xs text-gray-500">PDF, DOC, DOCX up to 10MB</p>
+                        </>
                       )}
                     </div>
                   </div>
                 </div>
+
+                {/* Upload progress bar */}
+                {uploadProgress > 0 && (
+                  <div className="pt-2">
+                    <div className="flex justify-between text-sm text-gray-600 mb-1">
+                      <span>Uploading...</span>
+                      <span>{uploadProgress}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Action buttons */}
                 <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200">
@@ -490,9 +491,7 @@ const StudentSubmissions = () => {
                     onClick={() => {
                       setShowSubmitModal(false);
                       setSelectedFile(null);
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = '';
-                      }
+                      setUploadProgress(0);
                     }}
                     className="px-6 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
                   >
@@ -500,13 +499,13 @@ const StudentSubmissions = () => {
                   </button>
                   <button
                     type="submit"
-                    disabled={uploading || !selectedFile}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors flex items-center"
+                    disabled={processingAction === 'submit' || !selectedFile}
+                    className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 transition-colors flex items-center"
                   >
-                    {uploading ? (
+                    {processingAction === 'submit' ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Submitting...
+                        Uploading...
                       </>
                     ) : (
                       <>
@@ -524,7 +523,7 @@ const StudentSubmissions = () => {
         {/* Details Modal */}
         {showDetailsModal && selectedSubmission && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full p-6 max-h-screen overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full p-6 max-h-screen overflow-y-auto">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Submission Details</h2>
                 <button
@@ -536,15 +535,16 @@ const StudentSubmissions = () => {
               </div>
 
               <div className="space-y-6">
-                {/* Title and Status */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Supervisor and Status Row */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div>
-                    <h3 className="text-sm font-medium text-gray-500">Title & Stage</h3>
-                    <p className="text-lg font-semibold text-gray-900">{selectedSubmission.title}</p>
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mt-2">
-                      <BookOpen className="w-4 h-4 mr-1" />
-                      {selectedSubmission.stage}
-                    </span>
+                    <h3 className="text-sm font-medium text-gray-500">Supervisor</h3>
+                    <p className="text-lg font-semibold text-gray-900">
+                      {selectedSubmission.supervisor?.user?.fullName || 'Unknown'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {selectedSubmission.supervisor?.department}
+                    </p>
                   </div>
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Status</h3>
@@ -552,15 +552,28 @@ const StudentSubmissions = () => {
                       {getStatusBadge(selectedSubmission.status)}
                     </div>
                   </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Stage</h3>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 mt-1">
+                      <BookOpen className="w-4 h-4 mr-1" />
+                      {selectedSubmission.stage}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Description */}
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                  <p className="text-gray-900 mt-1">{selectedSubmission.description}</p>
+                {/* Title and Description */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Title</h3>
+                    <p className="text-lg font-semibold text-gray-900">{selectedSubmission.title}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                    <p className="text-gray-900">{selectedSubmission.description}</p>
+                  </div>
                 </div>
 
-                {/* Dates */}
+                {/* Dates Row */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Created</h3>
@@ -569,6 +582,9 @@ const StudentSubmissions = () => {
                   <div>
                     <h3 className="text-sm font-medium text-gray-500">Deadline</h3>
                     <p className="text-gray-900">{formatDate(selectedSubmission.deadline)}</p>
+                    <p className={`text-sm font-medium ${getDeadlineStatus(selectedSubmission.deadline, selectedSubmission.submittedAt).color}`}>
+                      {getDeadlineStatus(selectedSubmission.deadline, selectedSubmission.submittedAt).text}
+                    </p>
                   </div>
                   {selectedSubmission.submittedAt && (
                     <div>
@@ -578,20 +594,7 @@ const StudentSubmissions = () => {
                   )}
                 </div>
 
-                {/* Supervisor */}
-                {selectedSubmission.supervisor && (
-                  <div>
-                    <h3 className="text-sm font-medium text-gray-500">Supervisor</h3>
-                    <div className="mt-1 flex items-center">
-                      <User className="w-5 h-5 text-gray-400 mr-2" />
-                      <span className="text-gray-900">
-                        {selectedSubmission.supervisor.user?.fullName || 'Dr. Mary Lecturer'}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* File */}
+                {/* File and Actions */}
                 {selectedSubmission.file?.url && (
                   <div className="border-t pt-4">
                     <h3 className="text-sm font-medium text-gray-500 mb-3">Submitted File</h3>
@@ -607,37 +610,19 @@ const StudentSubmissions = () => {
                   </div>
                 )}
 
-                {/* Grading Information */}
-                {selectedSubmission.grade && (
-                  <div className="border-t pt-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Grade & Feedback</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Grade</h4>
-                        <div className="flex items-center mt-1">
-                          <Star className="w-5 h-5 text-yellow-500 mr-1" />
-                          <span className="text-2xl font-bold text-gray-900">
-                            {selectedSubmission.grade}/100
-                          </span>
-                        </div>
-                      </div>
-                      {selectedSubmission.gradedAt && (
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-500">Graded At</h4>
-                          <p className="text-gray-900">{formatDate(selectedSubmission.gradedAt)}</p>
-                        </div>
-                      )}
-                    </div>
-                    {selectedSubmission.feedback && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-500">Feedback</h4>
-                        <div className="mt-1 p-4 bg-gray-50 rounded-md">
-                          <p className="text-gray-900">{selectedSubmission.feedback}</p>
-                        </div>
-                      </div>
-                    )}
+                {/* Submission Instructions */}
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Submission Instructions</h3>
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <ul className="list-disc list-inside space-y-2 text-sm text-blue-800">
+                      <li>Ensure your file is in PDF format for best compatibility</li>
+                      <li>File size should not exceed 10MB</li>
+                      <li>Name your file clearly (e.g., Chapter1_YourName.pdf)</li>
+                      <li>Submit before the deadline to avoid penalties</li>
+                      <li>You can only submit once per assignment</li>
+                    </ul>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
