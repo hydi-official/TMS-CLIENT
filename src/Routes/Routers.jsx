@@ -21,6 +21,9 @@ import Lecturers from '../Pages/student/Lecturers';
 import StudentApproval from '../Pages/lecturer/StudentApproval';
 import Submissions from '../Pages/lecturer/Submissions';
 import StudentSubmission from '../Pages/student/Submission';
+import Notifications from '../Pages/lecturer/Notifications';
+import StudentNotifications from '../Pages/student/StudentNotifications';
+import Annoucement from '../Pages/lecturer/Annoucement';
 
 const Routers = () => {
   return (
@@ -43,6 +46,8 @@ const Routers = () => {
       <Route path="/student/profile" element={<Profile />} />
       <Route path="/student/lecturers" element={<Lecturers />} />
       <Route path="/student/submissions" element={<StudentSubmission/>} />
+      <Route path="/student/notifications" element={<StudentNotifications/>} />
+
 
 
       {/* Lecturer routes */}
@@ -51,6 +56,10 @@ const Routers = () => {
       <Route path="/lecturer/students/approval" element={<StudentApproval />} />
       <Route path="/lecturer/profile" element={<Lecturerprofile />} />
       <Route path="/lecturer/submissions" element={<Submissions />} />
+      <Route path="/lecturer/notifications" element={<Notifications />} />
+      <Route path="/lecturer/announcements" element={<Annoucement />} />
+
+
 
 
 

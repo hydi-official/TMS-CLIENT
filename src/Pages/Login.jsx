@@ -100,7 +100,7 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-6">
             {/* Role Selection */}
-            <div>
+            {/* <div>
               <label className="block text-white text-sm font-medium mb-3">
                 Sign in as:
               </label>
@@ -139,7 +139,7 @@ const Login = () => {
                   Administrator
                 </label>
               </div>
-            </div>
+            </div> */}
 
             {/* User ID */}
             <div>

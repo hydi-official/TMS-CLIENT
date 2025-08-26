@@ -16,8 +16,15 @@ import {
   FileText,
   Calendar,
   BarChart3,
-  GraduationCap
+  GraduationCap,
+  BellIcon,
+  BookCheck,
+  FileArchive,
+  SpeakerIcon,
+  LucideMonitorSpeaker,
+  Megaphone
 } from 'lucide-react';
+import { FaMicrophone, FaSpeakerDeck } from 'react-icons/fa';
 
 const Sidebar = () => {
   const { isExpanded, toggleSidebar } = useSidebar();
@@ -113,10 +120,16 @@ const Sidebar = () => {
             active: location.pathname === '/student/lecturers'
           },
            {
-            icon: Calendar,
+            icon: FileArchive,
             label: 'Submissions',
             path: '/student/submissions',
             active: location.pathname === '/student/submissions'
+          },
+           {
+            icon: BellIcon,
+            label: 'Notifications',
+            path: '/student/notifications',
+            active: location.pathname === '/student/notifications'
           },
           {
             icon: Calendar,
@@ -142,35 +155,30 @@ const Sidebar = () => {
             active: location.pathname === '/lecturer/students'
           },
           {
-            icon: Users,
+            icon: UserCheck,
             label: 'Students Approval',
             path: '/lecturer/students/approval',
             active: location.pathname === '/lecturer/students/approval'
           },
            {
-            icon: Users,
+            icon: BookCheck,
             label: 'Lecturer Submissions',
             path: '/lecturer/submissions',
             active: location.pathname === '/lecturer/submissions'
           },
           {
-            icon: BookOpen,
-            label: 'Courses',
-            path: '/lecturer/courses',
-            active: location.pathname === '/lecturer/courses'
+            icon: BellIcon,
+            label: 'Notifications',
+            path: '/lecturer/notifications',
+            active: location.pathname === '/lecturer/notifications'
           },
-          {
-            icon: FileText,
-            label: 'Assignments',
-            path: '/lecturer/assignments',
-            active: location.pathname === '/lecturer/assignments'
+            {
+            icon: Megaphone,
+            label: 'Announcements',
+            path: '/lecturer/announcements',
+            active: location.pathname === '/lecturer/announcements'
           },
-          {
-            icon: BarChart3,
-            label: 'Analytics',
-            path: '/lecturer/analytics',
-            active: location.pathname === '/lecturer/analytics'
-          },
+          
           {
             icon: User,
             label: 'Profile',
