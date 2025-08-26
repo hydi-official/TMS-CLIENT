@@ -19,6 +19,7 @@ import ManageUsers from '../Pages/admin/ManageUsers';
 import ForgotPin from '../Pages/ForgotPin';
 import Lecturers from '../Pages/student/Lecturers';
 import StudentApproval from '../Pages/lecturer/StudentApproval';
+import Submissions from '../Pages/lecturer/Submissions';
 
 const Routers = () => {
   return (
@@ -46,6 +47,8 @@ const Routers = () => {
       <Route path="/lecturer/students" element={<Students />} />
       <Route path="/lecturer/students/approval" element={<StudentApproval />} />
       <Route path="/lecturer/profile" element={<Lecturerprofile />} />
+      <Route path="/lecturer/submissions" element={<Submissions />} />
+
 
 
       {/* Admin routes */}
