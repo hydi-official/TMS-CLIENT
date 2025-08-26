@@ -28,6 +28,7 @@ import Grades from '../Pages/student/Grades';
 import LectuererGrades from '../Pages/lecturer/LectuererGrades';
 import Thesis from '../Pages/lecturer/Thesis';
 import StudentThesis from '../Pages/student/StudentThesis';
+import StudentAnnouncement from '../Pages/student/StudentAnnoucement';
 
 const Routers = () => {
   return (
@@ -53,6 +54,8 @@ const Routers = () => {
       <Route path="/student/notifications" element={<StudentNotifications/>} />
       <Route path="/student/grades" element={<Grades/>} />
       <Route path="/student/thesis" element={<StudentThesis/>} />
+            <Route path="/student/announcements" element={<StudentAnnouncement/>} />
+
 
 
 

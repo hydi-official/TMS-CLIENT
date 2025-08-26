@@ -14,11 +14,15 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
-  Plus
+  Plus,
+  Camera,
+  Edit,
+  UserCheck
 } from 'lucide-react';
 
 const StudentDashboard = () => {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [dashboardData, setDashboardData] = useState({
     submissions: [],
     grades: [],
@@ -38,6 +42,35 @@ const StudentDashboard = () => {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
     };
+  };
+
+  // Check profile completeness
+  const getProfileCompleteness = () => {
+    const issues = [];
+    
+    if (!user?.profilePicture?.url) {
+      issues.push({
+        type: 'profile_picture',
+        title: 'Add Profile Picture',
+        message: 'Upload a profile picture to personalize your account',
+        action: 'Update Profile Picture',
+        icon: Camera,
+        color: 'bg-blue-500'
+      });
+    }
+    
+    if (!profile?.thesisTitle) {
+      issues.push({
+        type: 'thesis_title',
+        title: 'Set Thesis Title',
+        message: 'Add your thesis title to complete your academic profile',
+        action: 'Add Thesis Title',
+        icon: Edit,
+        color: 'bg-purple-500'
+      });
+    }
+    
+    return issues;
   };
 
   // Fetch all dashboard data
@@ -74,6 +107,7 @@ const StudentDashboard = () => {
       if (userResponse.status === 'fulfilled' && userResponse.value.ok) {
         const userData = await userResponse.value.json();
         setUser(userData.user);
+        setProfile(userData.profile); // Assuming profile data comes with user data
       }
 
       // Process submissions data
@@ -263,6 +297,7 @@ const StudentDashboard = () => {
   };
 
   const stats = calculateStats();
+  const profileIssues = getProfileCompleteness();
 
   const quickStats = [
     { 
@@ -308,6 +343,62 @@ const StudentDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Profile Completeness Alert */}
+      {profileIssues.length > 0 && (
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-start">
+              <AlertCircle className="h-5 w-5 text-yellow-400 mt-0.5 mr-3 flex-shrink-0" />
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-yellow-800 mb-2">
+                  Complete Your Profile
+                </h3>
+                <div className="space-y-2">
+                  {profileIssues.map((issue, index) => (
+                    <div key={index} className="flex items-center justify-between bg-yellow-100 rounded-lg p-3">
+                      <div className="flex items-center space-x-3">
+                        <div className={`${issue.color} p-1 rounded-full`}>
+                          <issue.icon className="h-4 w-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-yellow-800">{issue.title}</p>
+                          <p className="text-xs text-yellow-600">{issue.message}</p>
+                        </div>
+                      </div>
+                      <button className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs font-medium transition-colors">
+                        {issue.action}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Supervisor Assignment Status */}
+      {profile?.supervisor && (
+        <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center">
+              <UserCheck className="h-5 w-5 text-green-400 mr-3" />
+              <div>
+                <h3 className="text-sm font-medium text-green-800">
+                  Supervisor Assigned
+                </h3>
+                <p className="text-sm text-green-600 mt-1">
+                  You have been assigned to <strong>{profile.supervisor.user.fullName}</strong> in {profile.supervisor.department}
+                  <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                    {profile.supervisor.researchArea}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Welcome Header */}
       <div className="bg-white shadow-sm border-b border-gray-200 mb-8">
         <div className="max-w-7xl mx-auto px-6 py-8">
@@ -315,7 +406,15 @@ const StudentDashboard = () => {
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
                 <div className="h-16 w-16 bg-blue-500 rounded-lg shadow-sm border border-gray-200 p-2 flex items-center justify-center">
-                  <User className="h-8 w-8 text-white" />
+                  {user?.profilePicture?.url ? (
+                    <img
+                      src={user.profilePicture.url}
+                      alt="Profile"
+                      className="h-full w-full rounded-lg object-cover"
+                    />
+                  ) : (
+                    <User className="h-8 w-8 text-white" />
+                  )}
                 </div>
               </div>
               <div>
@@ -325,6 +424,11 @@ const StudentDashboard = () => {
                 <p className="text-gray-600 mt-2">
                   Ready to continue your academic journey today?
                 </p>
+                {profile?.currentStage && (
+                  <p className="text-sm text-blue-600 font-medium mt-1">
+                    Current Stage: {profile.currentStage.charAt(0).toUpperCase() + profile.currentStage.slice(1)}
+                  </p>
+                )}
               </div>
             </div>
             <div className="text-right">
