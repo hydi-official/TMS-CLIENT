@@ -25,7 +25,7 @@ const LecturerProfile = () => {
     confirmPin: ''
   });
 
-  const BASE_URL = 'http://localhost:5000/api';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com';
   
   // Get token from localStorage
   const getAuthToken = () => {

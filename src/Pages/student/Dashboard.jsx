@@ -33,7 +33,7 @@ const StudentDashboard = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [calendarActivities, setCalendarActivities] = useState([]);
 
-  const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
+  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com';
 
   // Get authentication headers
   const getAuthHeaders = () => {
