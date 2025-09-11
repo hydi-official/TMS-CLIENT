@@ -144,7 +144,7 @@ const Login = () => {
             {/* User ID */}
             <div>
               <label className="block text-white text-sm font-medium mb-2">
-                {selectedRole === "student" ? "Student ID:" : selectedRole === "lecturer" ? "Lecturer ID:" : "Admin ID:"}
+                Member ID
               </label>
               <input
                 type="text"

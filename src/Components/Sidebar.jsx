@@ -217,30 +217,15 @@ const Sidebar = () => {
             path: '/admin/manage-users',
             active: location.pathname === '/admin/manage-users'
           },
-          {
-            icon: GraduationCap,
-            label: 'Institutions',
-            path: '/admin/institutions',
-            active: location.pathname === '/admin/institutions'
-          },
+         
           {
             icon: BookOpen,
-            label: 'Courses',
-            path: '/admin/courses',
-            active: location.pathname === '/admin/courses'
+            label: 'Assignments',
+            path: '/admin/assignments',
+            active: location.pathname === '/admin/assignments'
           },
-          {
-            icon: BarChart3,
-            label: 'Reports',
-            path: '/admin/reports',
-            active: location.pathname === '/admin/reports'
-          },
-          {
-            icon: Settings,
-            label: 'Settings',
-            path: '/admin/settings',
-            active: location.pathname === '/admin/settings'
-          },
+         
+         
           {
             icon: User,
             label: 'Profile',
