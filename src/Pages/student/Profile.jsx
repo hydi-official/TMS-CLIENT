@@ -24,7 +24,7 @@ const Profile = () => {
     confirmPin: ''
   });
 
-  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com';
+  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com/api';
   
   // Get token from localStorage
   const getAuthToken = () => {

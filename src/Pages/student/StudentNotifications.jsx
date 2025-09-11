@@ -9,7 +9,7 @@ const StudentNotifications = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [filterType, setFilterType] = useState('all');
 
-  const BASE_URL = 'https://tms-backend-8gdz.onrender.com';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com/api';
 
   // Get token from localStorage (same as profile component)
   const getAuthToken = () => {
