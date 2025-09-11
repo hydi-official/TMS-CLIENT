@@ -14,7 +14,7 @@ import LecturerDashboard from '../Pages/lecturer/Dashboard';
 import Students from '../Pages/lecturer/Students';
 import Lecturerprofile from '../Pages/lecturer/Profile';
 
-import AdminDashboard from '../Pages/admin/Dashboard';
+import AdminDashboard from '../Pages/admin/AdminDashboard';
 import ManageUsers from '../Pages/admin/ManageUsers';
 import ForgotPin from '../Pages/ForgotPin';
 import Lecturers from '../Pages/student/Lecturers';
@@ -83,7 +83,7 @@ const Routers = () => {
 
 
       {/* Admin routes */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard/>} />
       <Route path="/admin/manage-users" element={<ManageUsers />} />
       <Route path="/admin/add-student" element={<AddStudent />} />
       <Route path="/admin/add-lecturer" element={<AddLectuerer />} />
