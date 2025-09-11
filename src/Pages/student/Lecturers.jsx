@@ -38,7 +38,7 @@ const Lecturers = () => {
   const CARDS_PER_PAGE = 18;
 
   // Get base URL and token
-  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com/api';
+  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com';
   const token = localStorage.getItem('token');
 
   useEffect(() => {

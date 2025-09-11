@@ -28,7 +28,7 @@ const StudentThesis = () => {
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
 
-  const BASE_URL = 'https://tms-backend-8gdz.onrender.com/api';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com';
 
   // Get token from localStorage
   const getAuthToken = () => {

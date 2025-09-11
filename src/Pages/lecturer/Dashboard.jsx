@@ -34,7 +34,7 @@ const SupervisorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const BASE_URL = 'https://tms-backend-8gdz.onrender.com/api';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com';
   
   const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
