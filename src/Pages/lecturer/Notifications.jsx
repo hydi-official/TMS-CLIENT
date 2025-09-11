@@ -8,7 +8,7 @@ const Notifications = () => {
   const [selectedNotifications, setSelectedNotifications] = useState([]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const BASE_URL = 'http://localhost:5000/api';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com/api';
 
   // Get token from localStorage (same as profile component)
   const getAuthToken = () => {

@@ -261,37 +261,49 @@ const Sidebar = () => {
   };
 
   return (
-    <div 
-      className={`bg-slate-800 text-white h-screen flex flex-col transition-all duration-300 ${
-        isExpanded ? 'w-64' : 'w-16'
-      } fixed left-0 top-0 z-30 shadow-lg`}
-    >
-      {/* Header with toggle */}
-      <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-        {isExpanded && (
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <GraduationCap size={20} />
-            </div>
-            <span className="font-bold text-lg">TMSPortal</span>
-          </div>
-        )}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 hover:bg-slate-700 rounded-lg transition-colors"
-        >
-          {isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-        </button>
-      </div>
-
-      {/* User Welcome Section */}
+    <>
+      {/* Mobile Backdrop */}
       {isExpanded && (
-        <div className="p-4 border-b border-slate-700">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
+          onClick={toggleSidebar}
+        />
+      )}
+      
+      {/* Sidebar */}
+      <div 
+        className={`
+          bg-slate-800 text-white h-screen flex flex-col transition-all duration-300 
+          fixed left-0 top-0 z-30 shadow-lg
+          ${isExpanded ? 'w-64' : 'w-16'}
+          ${isExpanded ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
+      >
+        {/* Header with toggle */}
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between min-h-[72px]">
+          {isExpanded && (
+            <div className="flex items-center space-x-2 overflow-hidden">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                <GraduationCap size={20} />
+              </div>
+              <span className="font-bold text-lg whitespace-nowrap">TMSPortal</span>
+            </div>
+          )}
+          <button
+            onClick={toggleSidebar}
+            className="p-2 hover:bg-slate-700 rounded-lg transition-colors flex-shrink-0"
+          >
+            {isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+        </div>
+
+        {/* User Welcome Section */}
+        <div className={`${isExpanded ? 'block' : 'hidden'} p-4 border-b border-slate-700`}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center flex-shrink-0">
               <User size={20} />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <p className="text-sm font-medium text-white truncate">
                 Welcome back!
               </p>
@@ -304,66 +316,107 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-      )}
 
-      {/* Navigation Menu */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
-          {menuItems.map((item, index) => (
-            <li key={index}>
-              <button
-                onClick={() => handleNavigation(item.path)}
-                className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-colors group ${
-                  item.active
-                    ? 'bg-indigo-600 text-white'
-                    : 'text-slate-300 hover:bg-slate-700 hover:text-white'
-                }`}
-              >
-                <item.icon size={20} className="flex-shrink-0" />
-                {isExpanded && (
-                  <span className="font-medium truncate">{item.label}</span>
-                )}
-                {!isExpanded && (
-                  <div className="absolute left-16 bg-slate-900 text-white px-2 py-1 rounded-md text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                    {item.label}
-                  </div>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
+        {/* Navigation Menu - Scrollable */}
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4">
+          <ul className="space-y-1">
+            {menuItems.map((item, index) => (
+              <li key={index} className="w-full">
+                <button
+                  onClick={() => handleNavigation(item.path)}
+                  className={`
+                    w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg 
+                    transition-all duration-200 group relative
+                    ${item.active
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                    }
+                  `}
+                >
+                  <item.icon size={20} className="flex-shrink-0" />
+                  {isExpanded ? (
+                    <span className="font-medium truncate text-left flex-1">
+                      {item.label}
+                    </span>
+                  ) : (
+                    <div className="
+                      absolute left-full ml-2 bg-slate-900 text-white px-3 py-2 
+                      rounded-md text-sm opacity-0 group-hover:opacity-100 
+                      transition-opacity duration-300 whitespace-nowrap z-50
+                      pointer-events-none
+                      before:absolute before:left-0 before:top-1/2 before:transform 
+                      before:-translate-y-1/2 before:-translate-x-1 
+                      before:border-4 before:border-transparent 
+                      before:border-r-slate-900
+                    ">
+                      {item.label}
+                    </div>
+                  )}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
-      {/* Bottom Section - Notifications & Logout */}
-      <div className="p-4 border-t border-slate-700">
-        <div className="space-y-2">
-          {/* Notifications */}
-          <button className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-slate-300 hover:bg-slate-700 hover:text-white transition-colors group">
-            <Bell size={20} className="flex-shrink-0" />
-            {isExpanded && <span className="font-medium">Notifications</span>}
-            {!isExpanded && (
-              <div className="absolute left-16 bg-slate-900 text-white px-2 py-1 rounded-md text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Notifications
-              </div>
-            )}
-          </button>
+        {/* Bottom Section - Notifications & Logout */}
+        <div className="p-4 border-t border-slate-700 flex-shrink-0">
+          <div className="space-y-1">
+            {/* Notifications */}
+            <button className="
+              w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg 
+              text-slate-300 hover:bg-slate-700 hover:text-white 
+              transition-all duration-200 group relative
+            ">
+              <Bell size={20} className="flex-shrink-0" />
+              {isExpanded ? (
+                <span className="font-medium text-left flex-1">Notifications</span>
+              ) : (
+                <div className="
+                  absolute left-full ml-2 bg-slate-900 text-white px-3 py-2 
+                  rounded-md text-sm opacity-0 group-hover:opacity-100 
+                  transition-opacity duration-300 whitespace-nowrap z-50
+                  pointer-events-none
+                  before:absolute before:left-0 before:top-1/2 before:transform 
+                  before:-translate-y-1/2 before:-translate-x-1 
+                  before:border-4 before:border-transparent 
+                  before:border-r-slate-900
+                ">
+                  Notifications
+                </div>
+              )}
+            </button>
 
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-red-300 hover:bg-red-600 hover:text-white transition-colors group"
-          >
-            <LogOut size={20} className="flex-shrink-0" />
-            {isExpanded && <span className="font-medium">Logout</span>}
-            {!isExpanded && (
-              <div className="absolute left-16 bg-red-600 text-white px-2 py-1 rounded-md text-sm opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                Logout
-              </div>
-            )}
-          </button>
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="
+                w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg 
+                text-red-300 hover:bg-red-600 hover:text-white 
+                transition-all duration-200 group relative
+              "
+            >
+              <LogOut size={20} className="flex-shrink-0" />
+              {isExpanded ? (
+                <span className="font-medium text-left flex-1">Logout</span>
+              ) : (
+                <div className="
+                  absolute left-full ml-2 bg-red-600 text-white px-3 py-2 
+                  rounded-md text-sm opacity-0 group-hover:opacity-100 
+                  transition-opacity duration-300 whitespace-nowrap z-50
+                  pointer-events-none
+                  before:absolute before:left-0 before:top-1/2 before:transform 
+                  before:-translate-y-1/2 before:-translate-x-1 
+                  before:border-4 before:border-transparent 
+                  before:border-r-red-600
+                ">
+                  Logout
+                </div>
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

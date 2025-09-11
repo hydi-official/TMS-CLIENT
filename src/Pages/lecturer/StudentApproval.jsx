@@ -8,7 +8,7 @@ const StudentApproval = () => {
   const [processingRequest, setProcessingRequest] = useState(null);
 
   // Get base URL and token from login
-  const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
+  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com/api';
   const token = localStorage.getItem('token');
 
   // Helper functions for profile images

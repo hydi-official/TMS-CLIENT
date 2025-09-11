@@ -41,7 +41,7 @@ const SubmissionsManagement = () => {
     status: 'pending'
   });
 
-  const BASE_URL = 'http://localhost:5000/api';
+  const BASE_URL = 'https://tms-backend-8gdz.onrender.com/api';
   const token = localStorage.getItem('token');
 
   // Fetch submissions

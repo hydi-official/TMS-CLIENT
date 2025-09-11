@@ -6,7 +6,7 @@ const StudentAnnouncement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const BASE_URL = import.meta.env.VITE_BASE_URL || 'http://localhost:5000/api';
+  const BASE_URL = import.meta.env.VITE_BASE_URL || 'https://tms-backend-8gdz.onrender.com/api';
   
   // Get token from localStorage (same as Profile component)
   const getAuthToken = () => {
