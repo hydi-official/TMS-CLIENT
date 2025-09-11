@@ -29,6 +29,8 @@ import LectuererGrades from '../Pages/lecturer/LectuererGrades';
 import Thesis from '../Pages/lecturer/Thesis';
 import StudentThesis from '../Pages/student/StudentThesis';
 import StudentAnnouncement from '../Pages/student/StudentAnnoucement';
+import AddStudent from '../Pages/admin/AddStudent';
+import AddLectuerer from '../Pages/admin/AddLectuerer';
 
 const Routers = () => {
   return (
@@ -81,6 +83,8 @@ const Routers = () => {
       {/* Admin routes */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/admin/manage-users" element={<ManageUsers />} />
+      <Route path="/admin/add-student" element={<AddStudent />} />
+      <Route path="/admin/add-lecturer" element={<AddLectuerer />} />
       <Route path="/admin/profile" element={<Profile />} />
 
     </Routes>
