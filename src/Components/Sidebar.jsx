@@ -175,12 +175,12 @@ const Sidebar = () => {
             path: '/lecturer/submissions',
             active: location.pathname === '/lecturer/submissions'
           },
-          {
-            icon: Library,
-            label: 'Lecturer Thesis',
-            path: '/lecturer/thesis',
-            active: location.pathname === '/lecturer/thesis'
-          },
+          // {
+          //   icon: Library,
+          //   label: 'Lecturer Thesis',
+          //   path: '/lecturer/thesis',
+          //   active: location.pathname === '/lecturer/thesis'
+          // },
            {
             icon: BarChart3,
             label: 'Grades',
