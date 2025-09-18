@@ -148,7 +148,7 @@ const Login = () => {
               </label>
               <input
                 type="text"
-                placeholder={`Enter ${selectedRole === "student" ? "Student" : selectedRole === "lecturer" ? "Lecturer" : "Admin"} ID`}
+                placeholder="Enter Your ID"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
                 className="w-full p-4 rounded-full bg-gray-200 text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-400"
@@ -181,7 +181,7 @@ const Login = () => {
                   : 'bg-gray-200 hover:bg-gray-300'
               }`}
             >
-              {loading ? "Logging in..." : `Login as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+              {loading ? "Logging in..." : `Login `}
             </button>
           </form>
 
